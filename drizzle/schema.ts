@@ -1,17 +1,10 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
  */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -25,4 +18,51 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * สถานที่ท่องเที่ยว
+ */
+export const places = mysqlTable("places", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // เช่น วัด, น้ำตก, อุทยาน
+  latitude: varchar("latitude", { length: 50 }).notNull(),
+  longitude: varchar("longitude", { length: 50 }).notNull(),
+  imageUrl: text("imageUrl"), // URL รูปภาพหลัก
+  videoUrl: text("videoUrl"), // URL วิดีโอ (ถ้ามี)
+  viewCount: int("viewCount").default(0).notNull(), // ยอดวิว
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Place = typeof places.$inferSelect;
+export type InsertPlace = typeof places.$inferInsert;
+
+/**
+ * รูปภาพเพิ่มเติมของสถานที่
+ */
+export const placeImages = mysqlTable("placeImages", {
+  id: int("id").autoincrement().primaryKey(),
+  placeId: int("placeId").notNull(),
+  imageUrl: text("imageUrl").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PlaceImage = typeof placeImages.$inferSelect;
+export type InsertPlaceImage = typeof placeImages.$inferInsert;
+
+/**
+ * รีวิวและคะแนน
+ */
+export const reviews = mysqlTable("reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  placeId: int("placeId").notNull(),
+  userId: int("userId").notNull(),
+  rating: int("rating").notNull(), // คะแนน 1-5
+  comment: text("comment"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = typeof reviews.$inferInsert;
