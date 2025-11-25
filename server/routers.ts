@@ -99,6 +99,11 @@ export const appRouter = router({
       }),
 
     // Get all reviews (admin only)
+    listAll: adminProcedure.query(async () => {
+      return await db.getAllReviews();
+    }),
+
+    // Get all reviews (admin only) - alias for compatibility
     list: adminProcedure.query(async () => {
       return await db.getAllReviews();
     }),
@@ -127,12 +132,24 @@ export const appRouter = router({
         await db.deleteReview(input.id);
         return { success: true };
       }),
+
+    // Get all reviews for admin (public alias)
+    getAllForAdmin: adminProcedure.query(async () => {
+      return await db.getAllReviews();
+    })
   }),
 
   stats: router({
     // Get view statistics (admin only)
     getViewStats: adminProcedure.query(async () => {
       return await db.getViewStats();
+    }),
+  }),
+
+  categories: router({
+    // Get all categories (public)
+    list: publicProcedure.query(async () => {
+      return await db.getAllCategories();
     }),
   }),
 });

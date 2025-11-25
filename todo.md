@@ -82,6 +82,18 @@
 - [x] สร้างเสียงบรรยาย AI Text-to-Speech สำหรับทั้ง 10 สถานที่
 - [x] อัปเดต seed data ให้มี audioUrl
 - [x] เพิ่มการแสดงเสียงบรรยายในหน้ารายละเอียดสถานที่
-- [ ] สร้างไฟล์ SQL สำหรับสร้างฟูนดข้อมูล
-- [ ] บันทึก Source Code ไว้ GitHub
-- [ ] บันทึก Checkpoint ฉบับสมบูรณ์
+- [x] สร้างไฟล์ SQL สำหรับสร้างฟูนดข้อมูล
+- [x] บันทึก Source Code ไว้ GitHub (Sandkani/Mae-Taeng-Tourism)
+- [x] บันทึก Checkpoint ฉบับสมบูรณ์
+
+
+## ฟีเจอร์เพิ่มเติม - ดูความเห็นผู้ใช้ หมวดหมู่ และ UI/UX มืออาชีพ
+- [x] เพิ่มหน้า Admin Comments - ดูรายการความเห็นทั้งหมด
+- [x] เพิ่มระบบกรองความเห็นตามสถานที่
+- [x] เพิ่มระบบจัดการหมวดหมู่สถานที่ (Category Management)
+- [x] สร้าง tRPC procedures สำหรับ getAllReviews และ getAllCategories
+- [x] เพิ่มลิงค์ Admin Comments และ Categories ใน Dashboard
+- [x] เขียน Unit Tests สำหรับ comments และ categories (9 tests)
+- [x] ทดสอบระบบทั้งหมด - ผ่าน 32/32 tests
+- [ ] บันทึก Checkpoint ฉบับสุดท้าย
+- [ ] Push Source Code ไว้ GitHub

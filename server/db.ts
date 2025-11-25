@@ -221,6 +221,43 @@ export async function deleteReview(id: number) {
   await db.delete(reviews).where(eq(reviews.id, id));
 }
 
+export async function getAllReviews() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select({
+      id: reviews.id,
+      placeId: reviews.placeId,
+      userId: reviews.userId,
+      rating: reviews.rating,
+      comment: reviews.comment,
+      createdAt: reviews.createdAt,
+      updatedAt: reviews.updatedAt,
+      userName: users.name,
+      placeName: places.name,
+    })
+    .from(reviews)
+    .leftJoin(users, eq(reviews.userId, users.id))
+    .leftJoin(places, eq(reviews.placeId, places.id))
+    .orderBy(desc(reviews.createdAt));
+  
+  return result;
+}
+
+// Categories queries
+export async function getAllCategories() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .selectDistinct({ category: places.category })
+    .from(places)
+    .orderBy(places.category);
+  
+  return result.map(r => r.category);
+}
+
 // View count queries
 export async function incrementViewCount(placeId: number) {
   const db = await getDb();
@@ -269,28 +306,4 @@ export async function getViewStats() {
     .limit(3);
   
   return { totalViews, viewsByCategory, topPlaces };
-}
-
-export async function getAllReviews() {
-  const db = await getDb();
-  if (!db) return [];
-  
-  const result = await db
-    .select({
-      id: reviews.id,
-      placeId: reviews.placeId,
-      userId: reviews.userId,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      createdAt: reviews.createdAt,
-      updatedAt: reviews.updatedAt,
-      userName: users.name,
-      placeName: places.name,
-    })
-    .from(reviews)
-    .leftJoin(users, eq(reviews.userId, users.id))
-    .leftJoin(places, eq(reviews.placeId, places.id))
-    .orderBy(desc(reviews.createdAt));
-  
-  return result;
 }

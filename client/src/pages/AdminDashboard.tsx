@@ -248,6 +248,36 @@ export default function AdminDashboard() {
               </Link>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>ดูความเห็นทั้งหมด</CardTitle>
+              <CardDescription>ดูและจัดการความเห็นของผู้ใช้</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/comments">
+                <Button className="w-full gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  ดูความเห็น
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>จัดการหมวดหมู่</CardTitle>
+              <CardDescription>จัดการหมวดหมู่สถานที่ท่องเที่ยว</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/categories">
+                <Button className="w-full gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  จัดการหมวดหมู่
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
       </main>
 
