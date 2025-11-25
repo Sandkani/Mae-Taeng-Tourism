@@ -95,5 +95,5 @@
 - [x] เพิ่มลิงค์ Admin Comments และ Categories ใน Dashboard
 - [x] เขียน Unit Tests สำหรับ comments และ categories (9 tests)
 - [x] ทดสอบระบบทั้งหมด - ผ่าน 32/32 tests
-- [ ] บันทึก Checkpoint ฉบับสุดท้าย
-- [ ] Push Source Code ไว้ GitHub
+- [x] บันทึก Checkpoint ฉบับสุดท้าย (version: f3a8d361)
+- [x] Push Source Code ไว้ GitHub (Sandkani/Mae-Taeng-Tourism)
