@@ -44,7 +44,7 @@ export default function AdminComments() {
       review.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       review.comment?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesPlace = !filterPlace || review.placeName === filterPlace;
+    const matchesPlace = filterPlace === "all" || !filterPlace || review.placeName === filterPlace;
     
     return matchesSearch && matchesPlace;
   });
@@ -82,7 +82,7 @@ export default function AdminComments() {
                 <SelectValue placeholder="กรองตามสถานที่" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">ทั้งหมด</SelectItem>
+                <SelectItem value="all">ทั้งหมด</SelectItem>
                 {uniquePlaces.map((place) => (
                   <SelectItem key={place} value={place as string}>
                     {place}
