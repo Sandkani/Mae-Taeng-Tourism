@@ -30,6 +30,7 @@ export const places = mysqlTable("places", {
   longitude: varchar("longitude", { length: 50 }).notNull(),
   imageUrl: text("imageUrl"), // URL รูปภาพหลัก
   videoUrl: text("videoUrl"), // URL วิดีโอ (ถ้ามี)
+  audioUrl: text("audioUrl"), // URL เสียงบรรยาย (ถ้ามี)
   viewCount: int("viewCount").default(0).notNull(), // ยอดวิว
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

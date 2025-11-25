@@ -179,6 +179,24 @@ export default function PlaceDetail() {
               </Card>
             )}
 
+            {/* Audio Narration */}
+            {place.audioUrl && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>เสียงบรรยายสถานที่</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <audio
+                    controls
+                    className="w-full"
+                    src={place.audioUrl}
+                  >
+                    บราวเชื่อเสียงของคุณไม่สนับสนุน HTML5 audio
+                  </audio>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Description */}
             <Card>
               <CardHeader>

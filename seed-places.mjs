@@ -10,6 +10,7 @@ const placesData = [
     longitude: "98.9876",
     imageUrl: "/images/wat-ban-den.jpg",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    audioUrl: "/audio/place-1-narration.wav",
     viewCount: 0
   },
   {
@@ -20,6 +21,7 @@ const placesData = [
     longitude: "98.9987",
     imageUrl: "/images/pine-forest.jpg",
     videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
+    audioUrl: "/audio/place-2-narration.wav",
     viewCount: 0
   },
   {
@@ -30,6 +32,7 @@ const placesData = [
     longitude: "98.9654",
     imageUrl: "/images/mae-ngat-dam.jpg",
     videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
+    audioUrl: "/audio/place-3-narration.wav",
     viewCount: 0
   },
   {
@@ -40,6 +43,7 @@ const placesData = [
     longitude: "98.8765",
     imageUrl: "/images/pong-dueat.jpg",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    audioUrl: "/audio/place-4-narration.wav",
     viewCount: 0
   },
   {
@@ -50,6 +54,7 @@ const placesData = [
     longitude: "98.8543",
     imageUrl: "/images/hai-khao-kod.jpg",
     videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
+    audioUrl: "/audio/place-5-narration.wav",
     viewCount: 0
   },
   {
@@ -60,6 +65,7 @@ const placesData = [
     longitude: "98.7654",
     imageUrl: "/images/elephant-camp.jpg",
     videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
+    audioUrl: "/audio/place-6-narration.wav",
     viewCount: 0
   },
   {
@@ -70,6 +76,7 @@ const placesData = [
     longitude: "98.6543",
     imageUrl: "/images/mok-fa-waterfall.jpg",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    audioUrl: "/audio/place-7-narration.wav",
     viewCount: 0
   },
   {
@@ -80,6 +87,7 @@ const placesData = [
     longitude: "98.5432",
     imageUrl: "/images/bua-tong-waterfall.jpg",
     videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
+    audioUrl: "/audio/place-8-narration.wav",
     viewCount: 0
   },
   {
@@ -90,6 +98,7 @@ const placesData = [
     longitude: "99.0123",
     imageUrl: "/images/dantewada.jpg",
     videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
+    audioUrl: "/audio/place-9-narration.wav",
     viewCount: 0
   },
   {
@@ -100,6 +109,7 @@ const placesData = [
     longitude: "98.9234",
     imageUrl: "/images/pangpao-beach.jpg",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    audioUrl: "/audio/place-10-narration.wav",
     viewCount: 0
   }
 ];
@@ -115,12 +125,12 @@ async function seedPlaces() {
     const [existingPlaces] = await connection.execute('SELECT COUNT(*) as count FROM places');
     
     if (existingPlaces[0].count > 0) {
-      console.log('⚠️  Places already exist. Updating with videoUrl...');
-      // Update existing places with videoUrl
+      console.log('⚠️  Places already exist. Updating with audioUrl...');
+      // Update existing places with audioUrl
       for (const place of placesData) {
         await connection.execute(
-          'UPDATE places SET videoUrl = ? WHERE name = ?',
-          [place.videoUrl, place.name]
+          'UPDATE places SET audioUrl = ? WHERE name = ?',
+          [place.audioUrl, place.name]
         );
         console.log(`✅ Updated: ${place.name}`);
       }
@@ -128,8 +138,8 @@ async function seedPlaces() {
       // Insert new places
       for (const place of placesData) {
         await connection.execute(
-          'INSERT INTO places (name, description, category, latitude, longitude, imageUrl, videoUrl, viewCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [place.name, place.description, place.category, place.latitude, place.longitude, place.imageUrl, place.videoUrl, place.viewCount]
+          'INSERT INTO places (name, description, category, latitude, longitude, imageUrl, videoUrl, audioUrl, viewCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [place.name, place.description, place.category, place.latitude, place.longitude, place.imageUrl, place.videoUrl, place.audioUrl, place.viewCount]
         );
         console.log(`✅ Inserted: ${place.name}`);
       }
