@@ -14,7 +14,7 @@ export default function AdminComments() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterPlace, setFilterPlace] = useState<string>("");
+  const [filterPlace, setFilterPlace] = useState<string>("all");
 
   // ตรวจสอบว่าเป็น admin หรือไม่
   if (user?.role !== "admin") {
