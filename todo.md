@@ -105,4 +105,4 @@
 - [x] เพิ่มระบบอัปโหลดเสียงบรรยายจากเครื่อง (ไม่ใช้ URL) ไปยัง S3
 - [x] เปลี่ยนช่องหมวดหมู่เป็น dropdown (เลือกจากรายการที่มี)
 - [x] อัปเดตหน้าเพิ่ม/แก้ไขสถานที่ให้รองรับการอัปโหลดไฟล์
-- [ ] Push code ไปยัง GitHub repository "Mae-Taeng-Tourism"
+- [x] Push code ไปยัง GitHub repository "Mae-Taeng-Tourism"
