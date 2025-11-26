@@ -5,17 +5,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Loader2, ArrowLeft, Plus, Pencil, Trash2, Eye } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Pencil, Trash2, Eye, Upload, X } from "lucide-react";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 
 export default function AdminPlaces() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const utils = trpc.useUtils();
   const { data: places = [], isLoading } = trpc.places.list.useQuery();
+  const { data: categories = [] } = trpc.categories.list.useQuery();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<any>(null);
@@ -26,7 +28,18 @@ export default function AdminPlaces() {
     latitude: "",
     longitude: "",
     imageUrl: "",
+    videoUrl: "",
+    audioUrl: "",
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadFile = trpc.upload.file.useMutation();
 
   const createPlace = trpc.places.create.useMutation({
     onSuccess: () => {
@@ -70,6 +83,8 @@ export default function AdminPlaces() {
       latitude: "",
       longitude: "",
       imageUrl: "",
+      videoUrl: "",
+      audioUrl: "",
     });
     setEditingPlace(null);
   };
@@ -84,11 +99,60 @@ export default function AdminPlaces() {
         latitude: place.latitude,
         longitude: place.longitude,
         imageUrl: place.imageUrl || "",
+        videoUrl: place.videoUrl || "",
+        audioUrl: place.audioUrl || "",
       });
     } else {
       resetForm();
     }
     setIsDialogOpen(true);
+  };
+
+  const handleFileUpload = async (file: File, type: 'image' | 'video' | 'audio') => {
+    try {
+      // Set loading state
+      if (type === 'image') setUploadingImage(true);
+      else if (type === 'video') setUploadingVideo(true);
+      else setUploadingAudio(true);
+
+      // Convert file to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          const base64Data = base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const base64Data = await base64Promise;
+
+      // Upload to S3
+      const result = await uploadFile.mutateAsync({
+        fileName: file.name,
+        fileData: base64Data,
+        contentType: file.type,
+      });
+
+      // Update form data
+      if (type === 'image') {
+        setFormData({ ...formData, imageUrl: result.url });
+        toast.success("อัปโหลดรูปภาพสำเร็จ");
+      } else if (type === 'video') {
+        setFormData({ ...formData, videoUrl: result.url });
+        toast.success("อัปโหลดวิดีโอสำเร็จ");
+      } else {
+        setFormData({ ...formData, audioUrl: result.url });
+        toast.success("อัปโหลดเสียงบรรยายสำเร็จ");
+      }
+    } catch (error) {
+      toast.error(`เกิดข้อผิดพลาดในการอัปโหลด: ${error}`);
+    } finally {
+      if (type === 'image') setUploadingImage(false);
+      else if (type === 'video') setUploadingVideo(false);
+      else setUploadingAudio(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -313,44 +377,190 @@ export default function AdminPlaces() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="category">หมวดหมู่ *</Label>
-                <Input
-                  id="category"
+                <Select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="เช่น วัด, น้ำตก, อุทยาน"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกหมวดหมู่" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <Label htmlFor="imageUrl">URL รูปภาพ</Label>
-                <Input
-                  id="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder="/images/place.jpg"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="latitude">ละติจูด *</Label>
+                  <Input
+                    id="latitude"
+                    value={formData.latitude}
+                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                    placeholder="19.1234"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="longitude">ลองจิจูด *</Label>
+                  <Input
+                    id="longitude"
+                    value={formData.longitude}
+                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                    placeholder="98.9876"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="latitude">ละติจูด *</Label>
-                <Input
-                  id="latitude"
-                  value={formData.latitude}
-                  onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                  placeholder="19.1234"
+            {/* Image Upload */}
+            <div>
+              <Label>รูปภาพ</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file, 'image');
+                  }}
                 />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  className="gap-2"
+                >
+                  {uploadingImage ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      กำลังอัปโหลด...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      เลือกรูปภาพ
+                    </>
+                  )}
+                </Button>
+                {formData.imageUrl && (
+                  <div className="flex items-center gap-2">
+                    <img src={formData.imageUrl} alt="Preview" className="h-10 w-10 rounded object-cover" />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
+            </div>
 
-              <div>
-                <Label htmlFor="longitude">ลองจิจูด *</Label>
-                <Input
-                  id="longitude"
-                  value={formData.longitude}
-                  onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                  placeholder="98.9876"
+            {/* Video Upload */}
+            <div>
+              <Label>วิดีโอ</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file, 'video');
+                  }}
                 />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => videoInputRef.current?.click()}
+                  disabled={uploadingVideo}
+                  className="gap-2"
+                >
+                  {uploadingVideo ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      กำลังอัปโหลด...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      เลือกวิดีโอ
+                    </>
+                  )}
+                </Button>
+                {formData.videoUrl && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-green-600">✓ อัปโหลดแล้ว</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, videoUrl: "" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Audio Upload */}
+            <div>
+              <Label>เสียงบรรยาย</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={audioInputRef}
+                  type="file"
+                  accept="audio/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file, 'audio');
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => audioInputRef.current?.click()}
+                  disabled={uploadingAudio}
+                  className="gap-2"
+                >
+                  {uploadingAudio ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      กำลังอัปโหลด...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      เลือกเสียงบรรยาย
+                    </>
+                  )}
+                </Button>
+                {formData.audioUrl && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-green-600">✓ อัปโหลดแล้ว</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, audioUrl: "" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
+import { storagePut } from "./storage";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -57,6 +58,7 @@ export const appRouter = router({
         longitude: z.string(),
         imageUrl: z.string().optional(),
         videoUrl: z.string().optional(),
+        audioUrl: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         await db.createPlace(input);
@@ -74,6 +76,7 @@ export const appRouter = router({
         longitude: z.string().optional(),
         imageUrl: z.string().optional(),
         videoUrl: z.string().optional(),
+        audioUrl: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
@@ -151,6 +154,30 @@ export const appRouter = router({
     list: publicProcedure.query(async () => {
       return await db.getAllCategories();
     }),
+  }),
+
+  upload: router({
+    // Upload file to S3 (admin only)
+    file: adminProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileData: z.string(), // base64 encoded
+        contentType: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        // Decode base64
+        const buffer = Buffer.from(input.fileData, 'base64');
+        
+        // Generate unique file key
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(2, 8);
+        const fileKey = `uploads/${timestamp}-${randomSuffix}-${input.fileName}`;
+        
+        // Upload to S3
+        const result = await storagePut(fileKey, buffer, input.contentType);
+        
+        return { url: result.url, key: result.key };
+      }),
   }),
 });
 
