@@ -1,0 +1,82 @@
+{
+  "query": "SELECT * FROM reviews LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3XAtRwTqPyzS6hX.root --database gDxZfCJNApi4m9CYR4UvN6 --execute SELECT * FROM reviews LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "placeId": "8",
+      "userId": "2",
+      "rating": "5",
+      "comment": "Great place to visit!",
+      "createdAt": "2025-11-24 11:57:20",
+      "updatedAt": "2025-11-24 11:57:20"
+    },
+    {
+      "id": "3",
+      "placeId": "30001",
+      "userId": "2",
+      "rating": "5",
+      "comment": "Great place to visit!",
+      "createdAt": "2025-11-24 11:57:56",
+      "updatedAt": "2025-11-24 11:57:56"
+    },
+    {
+      "id": "5",
+      "placeId": "30003",
+      "userId": "2",
+      "rating": "5",
+      "comment": "Great place to visit!",
+      "createdAt": "2025-11-24 11:58:23",
+      "updatedAt": "2025-11-24 11:58:23"
+    },
+    {
+      "id": "30001",
+      "placeId": "30005",
+      "userId": "2",
+      "rating": "5",
+      "comment": "Great place to visit!",
+      "createdAt": "2025-11-24 12:39:23",
+      "updatedAt": "2025-11-24 12:39:23"
+    },
+    {
+      "id": "120001",
+      "placeId": "2",
+      "userId": "390003",
+      "rating": "5",
+      "comment": "",
+      "createdAt": "2025-11-25 02:03:43",
+      "updatedAt": "2025-11-25 02:03:43"
+    },
+    {
+      "id": "150001",
+      "placeId": "9",
+      "userId": "390003",
+      "rating": "5",
+      "comment": "",
+      "createdAt": "2025-11-25 02:42:49",
+      "updatedAt": "2025-11-25 02:42:49"
+    },
+    {
+      "id": "180001",
+      "placeId": "1",
+      "userId": "1",
+      "rating": "5",
+      "comment": "สถานที่สวยมากครับ ห้ามพลาด!",
+      "createdAt": "2025-11-26 01:04:45",
+      "updatedAt": "2025-11-26 01:04:45"
+    },
+    {
+      "id": "180004",
+      "placeId": "10",
+      "userId": "1",
+      "rating": "5",
+      "comment": "สวย",
+      "createdAt": "2025-11-26 01:06:58",
+      "updatedAt": "2025-11-26 01:06:58"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tplaceId\tuserId\trating\tcomment\tcreatedAt\tupdatedAt\n1\t8\t2\t5\tGreat place to visit!\t2025-11-24 11:57:20\t2025-11-24 11:57:20\n3\t30001\t2\t5\tGreat place to visit!\t2025-11-24 11:57:56\t2025-11-24 11:57:56\n5\t30003\t2\t5\tGreat place to visit!\t2025-11-24 11:58:23\t2025-11-24 11:58:23\n30001\t30005\t2\t5\tGreat place to visit!\t2025-11-24 12:39:23\t2025-11-24 12:39:23\n120001\t2\t390003\t5\t\t2025-11-25 02:03:43\t2025-11-25 02:03:43\n150001\t9\t390003\t5\t\t2025-11-25 02:42:49\t2025-11-25 02:42:49\n180001\t1\t1\t5\tสถานที่สวยมากครับ ห้ามพลาด!\t2025-11-26 01:04:45\t2025-11-26 01:04:45\n180004\t10\t1\t5\tสวย\t2025-11-26 01:06:58\t2025-11-26 01:06:58\n",
+  "stderr": "",
+  "execution_time_ms": 2807
+}
