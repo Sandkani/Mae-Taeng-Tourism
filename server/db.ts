@@ -1,6 +1,6 @@
 import { eq, desc, sql, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, places, reviews, InsertPlace, InsertReview } from "../drizzle/schema";
+import { InsertUser, users, places, reviews, InsertPlace, InsertReview, categories, InsertCategory } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -251,11 +251,33 @@ export async function getAllCategories() {
   if (!db) return [];
   
   const result = await db
-    .selectDistinct({ category: places.category })
-    .from(places)
-    .orderBy(places.category);
+    .select()
+    .from(categories)
+    .orderBy(categories.name);
   
-  return result.map(r => r.category);
+  return result;
+}
+
+export async function createCategory(category: InsertCategory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(categories).values(category);
+  return result;
+}
+
+export async function updateCategory(id: number, category: Partial<InsertCategory>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(categories).set(category).where(eq(categories.id, id));
+}
+
+export async function deleteCategory(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(categories).where(eq(categories.id, id));
 }
 
 // View count queries

@@ -154,6 +154,38 @@ export const appRouter = router({
     list: publicProcedure.query(async () => {
       return await db.getAllCategories();
     }),
+
+    // Create category (admin only)
+    create: adminProcedure
+      .input(z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.createCategory(input);
+        return { success: true };
+      }),
+
+    // Update category (admin only)
+    update: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await db.updateCategory(id, data);
+        return { success: true };
+      }),
+
+    // Delete category (admin only)
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteCategory(input.id);
+        return { success: true };
+      }),
   }),
 
   upload: router({

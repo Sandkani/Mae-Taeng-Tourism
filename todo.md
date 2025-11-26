@@ -106,3 +106,11 @@
 - [x] เปลี่ยนช่องหมวดหมู่เป็น dropdown (เลือกจากรายการที่มี)
 - [x] อัปเดตหน้าเพิ่ม/แก้ไขสถานที่ให้รองรับการอัปโหลดไฟล์
 - [x] Push code ไปยัง GitHub repository "Mae-Taeng-Tourism"
+
+## ฟีเจอร์ใหม่ - จัดการหมวดหมู่
+- [x] เพิ่มฟิลด์ imageUrl ในตาราง categories
+- [x] เพิ่ม procedure สำหรับแก้ไขหมวดหมู่ (categories.update)
+- [x] เพิ่ม procedure สำหรับลบหมวดหมู่ (categories.delete)
+- [x] อัปเดตหน้า AdminCategories ให้รองรับการแก้ไข/ลบ/อัปโหลดรูป
+- [x] เขียน unit tests สำหรับ categories procedures
+- [ ] Push code ไปยัง GitHub
