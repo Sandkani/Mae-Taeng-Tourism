@@ -113,4 +113,4 @@
 - [x] เพิ่ม procedure สำหรับลบหมวดหมู่ (categories.delete)
 - [x] อัปเดตหน้า AdminCategories ให้รองรับการแก้ไข/ลบ/อัปโหลดรูป
 - [x] เขียน unit tests สำหรับ categories procedures
-- [ ] Push code ไปยัง GitHub
+- [x] Push code ไปยัง GitHub
