@@ -121,3 +121,15 @@
 - [x] เพิ่มวิธีติดตั้งและใช้งาน
 - [x] เพิ่มข้อมูลเกี่ยวกับฟีเจอร์ทั้งหมด
 - [x] Push ไปยัง GitHub
+
+
+## UI/UX ระดับมืออาชีพ
+- [x] ปรับ Color Palette ให้สวยงามและเหมาะกับธรรมชาติ
+- [x] เพิ่ม Animations & Transitions
+- [x] ปรับ Layout & Spacing ให้ดูเป็นระเบียบ
+- [x] เพิ่ม Visual Effects (Shadows, Gradients, Hover)
+- [x] ปรับปรุงหน้าแรก (Home)
+- [x] ปรับปรุงหน้ารายละเอียด (PlaceDetail)
+- [ ] ปรับปรุงหน้า Admin Dashboard (ข้ามไว้ก่อน)
+- [x] ทดสอบ Responsive Design
+- [ ] Push ไปยัง GitHub

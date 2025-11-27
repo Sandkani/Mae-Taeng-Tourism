@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Star, Eye, Loader2 } from "lucide-react";
+import { MapPin, Star, Eye, Loader2, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -12,103 +12,135 @@ export default function Home() {
   const { data: places, isLoading } = trpc.places.list.useQuery();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen flex flex-col">
+      {/* Header with glass morphism */}
+      <header className="glass sticky top-0 z-50 border-b border-border/40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={APP_LOGO} alt={APP_TITLE} className="h-12 w-12" />
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all duration-300">
+            <img src={APP_LOGO} alt={APP_TITLE} className="h-12 w-12 rounded-full shadow-md" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{APP_TITLE}</h1>
-              <p className="text-sm text-gray-600">จังหวัดเชียงใหม่</p>
+              <h1 className="text-xl font-bold text-foreground">{APP_TITLE}</h1>
+              <p className="text-sm text-muted-foreground">จังหวัดเชียงใหม่</p>
             </div>
           </Link>
           
           <div className="flex items-center gap-4">
             {authLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             ) : isAuthenticated && user ? (
               <>
                 <Link href="/profile">
-                  <Button variant="ghost" className="gap-2">
+                  <Button variant="ghost" className="gap-2 hover:bg-primary/10">
                     <span className="hidden sm:inline">{user.name || user.email}</span>
                     <span className="sm:hidden">โปรไฟล์</span>
                   </Button>
                 </Link>
                 {user.role === 'admin' && (
                   <Link href="/admin">
-                    <Button variant="default">Dashboard</Button>
+                    <Button className="bg-gradient-nature hover:opacity-90 transition-all">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Button>
                   </Link>
                 )}
               </>
             ) : (
               <a href={getLoginUrl()}>
-                <Button variant="default">เข้าสู่ระบบ</Button>
+                <Button className="bg-gradient-nature hover:opacity-90 transition-all">เข้าสู่ระบบ</Button>
               </a>
             )}
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            สำรวจความงามของแม่แตง
+      {/* Hero Section with animated gradient */}
+      <section className="relative bg-gradient-nature text-white py-20 md:py-28 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+            <MapPin className="h-4 w-4" />
+            <span className="text-sm font-medium">อำเภอแม่แตง จังหวัดเชียงใหม่</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            สำรวจความงามของ<br />
+            <span className="inline-block mt-2">แม่แตง</span>
           </h2>
-          <p className="text-lg md:text-xl text-green-50 max-w-2xl mx-auto">
-            ค้นพบสถานที่ท่องเที่ยวที่น่าสนใจ ธรรมชาติสวยงาม และวัฒนธรรมท้องถิ่นในอำเภอแม่แตง จังหวัดเชียงใหม่
+          
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8">
+            ค้นพบสถานที่ท่องเที่ยวที่น่าสนใจ ธรรมชาติสวยงาม และวัฒนธรรมท้องถิ่น
           </p>
+          
+          {!isAuthenticated && (
+            <a href={getLoginUrl()}>
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all">
+                เริ่มต้นสำรวจ
+              </Button>
+            </a>
+          )}
         </div>
       </section>
 
       {/* Places Grid */}
-      <main className="container mx-auto px-4 py-12 flex-1">
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">สถานที่ท่องเที่ยวทั้งหมด</h3>
-          <p className="text-gray-600">เลือกสถานที่ที่คุณสนใจเพื่อดูรายละเอียดเพิ่มเติม</p>
+      <main className="container mx-auto px-4 py-16 flex-1">
+        <div className="mb-12 text-center">
+          <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+            สถานที่ท่องเที่ยวทั้งหมด
+          </h3>
+          <p className="text-muted-foreground text-lg">
+            เลือกสถานที่ที่คุณสนใจเพื่อดูรายละเอียดเพิ่มเติม
+          </p>
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-green-600" />
+          <div className="flex flex-col justify-center items-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">กำลังโหลดสถานที่ท่องเที่ยว...</p>
           </div>
         ) : places && places.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {places.map((place) => (
               <Link key={place.id} href={`/place/${place.id}`}>
-                <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden group">
-                  <div className="relative h-48 overflow-hidden">
+                <Card className="h-full hover-lift cursor-pointer overflow-hidden border-border/50 group">
+                  <div className="relative h-56 overflow-hidden">
                     <img
                       src={place.imageUrl || '/images/placeholder.jpg'}
                       alt={place.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 right-3">
-                      <Badge className="bg-white/90 text-gray-900 hover:bg-white">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-white/95 text-foreground hover:bg-white shadow-lg backdrop-blur-sm">
                         {place.category}
                       </Badge>
                     </div>
                   </div>
                   
-                  <CardHeader>
-                    <CardTitle className="text-xl line-clamp-1">{place.name}</CardTitle>
-                    <CardDescription className="line-clamp-2">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-xl line-clamp-1 group-hover:text-primary transition-colors">
+                      {place.name}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2 text-muted-foreground">
                       {place.description}
                     </CardDescription>
                   </CardHeader>
                   
-                  <CardFooter className="flex items-center justify-between text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
+                  <CardFooter className="flex items-center justify-between text-sm pt-0">
+                    <div className="flex items-center gap-1.5">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">
-                        {place.avgRating > 0 ? place.avgRating.toFixed(1) : 'ยังไม่มีรีวิว'}
+                      <span className="font-semibold text-foreground">
+                        {place.avgRating > 0 ? place.avgRating.toFixed(1) : 'ไม่มีรีวิว'}
                       </span>
                       {place.reviewCount > 0 && (
-                        <span className="text-gray-400">({place.reviewCount})</span>
+                        <span className="text-muted-foreground">({place.reviewCount})</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Eye className="h-4 w-4" />
                       <span>{place.viewCount || 0}</span>
                     </div>
@@ -119,18 +151,29 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <MapPin className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">ยังไม่มีสถานที่ท่องเที่ยว</p>
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-6">
+              <MapPin className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground text-lg">ยังไม่มีสถานที่ท่องเที่ยว</p>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 mt-12">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">
-            © 2024 {APP_TITLE} | จังหวัดเชียงใหม่
-          </p>
+      <footer className="bg-gradient-nature text-white py-12 mt-16">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <img src={APP_LOGO} alt={APP_TITLE} className="h-10 w-10 rounded-full" />
+              <div className="text-left">
+                <p className="font-semibold">{APP_TITLE}</p>
+                <p className="text-sm text-white/80">จังหวัดเชียงใหม่</p>
+              </div>
+            </div>
+            <p className="text-white/80 text-sm">
+              © 2024 {APP_TITLE}. สงวนลิขสิทธิ์.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

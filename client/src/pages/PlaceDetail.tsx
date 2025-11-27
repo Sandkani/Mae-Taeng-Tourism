@@ -74,15 +74,15 @@ export default function PlaceDetail() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+      <header className="glass sticky top-0 z-50 border-b border-border/40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={APP_LOGO} alt={APP_TITLE} className="h-12 w-12" />
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all duration-300">
+            <img src={APP_LOGO} alt={APP_TITLE} className="h-12 w-12 rounded-full shadow-md" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{APP_TITLE}</h1>
-              <p className="text-sm text-gray-600">จังหวัดเชียงใหม่</p>
+              <h1 className="text-xl font-bold text-foreground">{APP_TITLE}</h1>
+              <p className="text-sm text-muted-foreground">จังหวัดเชียงใหม่</p>
             </div>
           </Link>
           
@@ -90,20 +90,20 @@ export default function PlaceDetail() {
             {isAuthenticated && user ? (
               <>
                 <Link href="/profile">
-                  <Button variant="ghost" className="gap-2">
+                  <Button variant="ghost" className="gap-2 hover:bg-primary/10">
                     <span className="hidden sm:inline">{user.name || user.email}</span>
                     <span className="sm:hidden">โปรไฟล์</span>
                   </Button>
                 </Link>
                 {user.role === 'admin' && (
                   <Link href="/admin">
-                    <Button variant="default">Dashboard</Button>
+                    <Button className="bg-gradient-nature hover:opacity-90 transition-all">Dashboard</Button>
                   </Link>
                 )}
               </>
             ) : (
               <a href={getLoginUrl()}>
-                <Button variant="default">เข้าสู่ระบบ</Button>
+                <Button className="bg-gradient-nature hover:opacity-90 transition-all">เข้าสู่ระบบ</Button>
               </a>
             )}
           </div>
@@ -126,14 +126,14 @@ export default function PlaceDetail() {
           {/* Left Column - Image and Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image */}
-            <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
+            <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl hover-lift">
               <img
                 src={place.imageUrl || '/images/placeholder.jpg'}
                 alt={place.name}
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-4 left-4">
-                <Badge className="bg-white/90 text-gray-900 text-base px-3 py-1">
+                <Badge className="bg-white/95 text-foreground text-base px-4 py-1.5 shadow-lg backdrop-blur-sm">
                   {place.category}
                 </Badge>
               </div>
@@ -141,8 +141,8 @@ export default function PlaceDetail() {
 
             {/* Title and Stats */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">{place.name}</h2>
-              <div className="flex items-center gap-6 text-gray-600">
+              <h2 className="text-4xl font-bold text-foreground mb-4">{place.name}</h2>
+              <div className="flex items-center gap-6 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   <span className="font-medium text-lg">
@@ -210,7 +210,7 @@ export default function PlaceDetail() {
             </Card>
 
             {/* Reviews Section */}
-            <Card>
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>รีวิวจากผู้เยี่ยมชม</CardTitle>
                 <CardDescription>
@@ -260,7 +260,7 @@ export default function PlaceDetail() {
 
             {/* Add Review Form */}
             {isAuthenticated ? (
-              <Card>
+              <Card className="border-primary/20 bg-primary/5">
                 <CardHeader>
                   <CardTitle>เขียนรีวิว</CardTitle>
                   <CardDescription>แบ่งปันประสบการณ์ของคุณกับผู้อื่น</CardDescription>
