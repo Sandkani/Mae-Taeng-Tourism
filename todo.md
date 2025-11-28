@@ -132,4 +132,4 @@
 - [x] ปรับปรุงหน้ารายละเอียด (PlaceDetail)
 - [ ] ปรับปรุงหน้า Admin Dashboard (ข้ามไว้ก่อน)
 - [x] ทดสอบ Responsive Design
-- [ ] Push ไปยัง GitHub
+- [x] Push ไปยัง GitHub
