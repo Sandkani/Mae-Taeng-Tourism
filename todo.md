@@ -133,3 +133,20 @@
 - [ ] ปรับปรุงหน้า Admin Dashboard (ข้ามไว้ก่อน)
 - [x] ทดสอบ Responsive Design
 - [x] Push ไปยัง GitHub
+
+
+## ฟีเจอร์ใหม่ - ค้นหา กรอง และ Favorites
+- [x] เพิ่มช่องค้นหาสถานที่ตามชื่อ
+- [x] เพิ่ม dropdown กรองตามหมวดหมู่
+- [x] เพิ่มเรียงลำดับตามคะแนน/ยอดวิว
+- [x] เพิ่มตาราง favorites ใน schema
+- [x] เพิ่ม procedures สำหรับ favorites (add, remove, list, isFavorite)
+- [x] เพิ่มปุ่มบันทึกสถานที่ที่ชื่นชอบในหน้า PlaceDetail
+- [x] สร้างหน้า Favorites (/favorites)
+- [x] สร้างหน้าแผนที่รวม (/map)
+- [x] เพิ่ม markers สำหรับสถานที่ทั้งหมด
+- [x] เพิ่มลิงก์ไปหน้า Favorites และ Map View ใน header
+- [x] ลบข้อมูล Test Place ออกจากฐานข้อมูล
+- [x] เขียน unit tests สำหรับ favorites (7 tests)
+- [x] ทดสอบระบบทั้งหมด - ผ่าน 45/45 tests
+- [ ] Push ไปยัง GitHub

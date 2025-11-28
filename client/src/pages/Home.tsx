@@ -2,14 +2,54 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Star, Eye, Loader2, Sparkles } from "lucide-react";
+import { MapPin, Star, Eye, Loader2, Sparkles, Search, Filter } from "lucide-react";
 import { Link } from "wouter";
+import { useState, useMemo } from "react";
 
 export default function Home() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const { data: places, isLoading } = trpc.places.list.useQuery();
+  const { data: categories } = trpc.categories.list.useQuery();
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("name"); // name, rating, views
+  
+  // Filter and sort places
+  const filteredPlaces = useMemo(() => {
+    if (!places) return [];
+    
+    let filtered = [...places];
+    
+    // Search by name
+    if (searchQuery) {
+      filtered = filtered.filter(place =>
+        place.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(place => place.category === selectedCategory);
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+      if (sortBy === "rating") {
+        return (b.avgRating || 0) - (a.avgRating || 0);
+      } else if (sortBy === "views") {
+        return (b.viewCount || 0) - (a.viewCount || 0);
+      } else {
+        return a.name.localeCompare(b.name, 'th');
+      }
+    });
+    
+    return filtered;
+  }, [places, searchQuery, selectedCategory, sortBy]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -24,11 +64,23 @@ export default function Home() {
             </div>
           </Link>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {authLoading ? (
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             ) : isAuthenticated && user ? (
               <>
+                <Link href="/favorites">
+                  <Button variant="ghost" className="gap-2 hover:bg-primary/10">
+                    <span className="hidden sm:inline">รายการโปรด</span>
+                    <span className="sm:hidden">โปรด</span>
+                  </Button>
+                </Link>
+                <Link href="/map">
+                  <Button variant="ghost" className="gap-2 hover:bg-primary/10">
+                    <span className="hidden sm:inline">แผนที่</span>
+                    <span className="sm:hidden">แผนที่</span>
+                  </Button>
+                </Link>
                 <Link href="/profile">
                   <Button variant="ghost" className="gap-2 hover:bg-primary/10">
                     <span className="hidden sm:inline">{user.name || user.email}</span>
@@ -88,13 +140,72 @@ export default function Home() {
 
       {/* Places Grid */}
       <main className="container mx-auto px-4 py-16 flex-1">
-        <div className="mb-12 text-center">
-          <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-            สถานที่ท่องเที่ยวทั้งหมด
-          </h3>
-          <p className="text-muted-foreground text-lg">
-            เลือกสถานที่ที่คุณสนใจเพื่อดูรายละเอียดเพิ่มเติม
-          </p>
+        <div className="mb-12">
+          <div className="text-center mb-8">
+            <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+              สถานที่ท่องเที่ยวทั้งหมด
+            </h3>
+            <p className="text-muted-foreground text-lg">
+              เลือกสถานที่ที่คุณสนใจเพื่อดูรายละเอียดเพิ่มเติม
+            </p>
+          </div>
+          
+          {/* Search and Filter */}
+          <div className="max-w-4xl mx-auto">
+            <Card className="border-border/50 shadow-lg">
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="ค้นหาชื่อสถานที่..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  
+                  {/* Category Filter */}
+                  <div>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                      <SelectTrigger>
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="หมวดหมู่" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">ทั้งหมด</SelectItem>
+                        {categories?.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.name}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Sort */}
+                  <div>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="เรียงลำดับ" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="name">ชื่อ (A-Z)</SelectItem>
+                        <SelectItem value="rating">คะแนนสูงสุด</SelectItem>
+                        <SelectItem value="views">ยอดวิวสูงสุด</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                {/* Results count */}
+                <div className="mt-4 text-sm text-muted-foreground text-center">
+                  พบ {filteredPlaces.length} สถานที่
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {isLoading ? (
@@ -102,9 +213,9 @@ export default function Home() {
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
             <p className="text-muted-foreground">กำลังโหลดสถานที่ท่องเที่ยว...</p>
           </div>
-        ) : places && places.length > 0 ? (
+        ) : filteredPlaces && filteredPlaces.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {places.map((place) => (
+            {filteredPlaces.map((place) => (
               <Link key={place.id} href={`/place/${place.id}`}>
                 <Card className="h-full hover-lift cursor-pointer overflow-hidden border-border/50 group">
                   <div className="relative h-56 overflow-hidden">

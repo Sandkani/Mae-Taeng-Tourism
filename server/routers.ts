@@ -211,6 +211,36 @@ export const appRouter = router({
         return { url: result.url, key: result.key };
       }),
   }),
+  
+  favorites: router({
+    // Add favorite
+    add: protectedProcedure
+      .input(z.object({ placeId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.addFavorite(ctx.user.id, input.placeId);
+        return { success: true };
+      }),
+    
+    // Remove favorite
+    remove: protectedProcedure
+      .input(z.object({ placeId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.removeFavorite(ctx.user.id, input.placeId);
+        return { success: true };
+      }),
+    
+    // Get user favorites
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserFavorites(ctx.user.id);
+    }),
+    
+    // Check if place is favorite
+    isFavorite: protectedProcedure
+      .input(z.object({ placeId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.isFavorite(ctx.user.id, input.placeId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

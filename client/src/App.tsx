@@ -12,6 +12,8 @@ import AdminPlaces from "./pages/AdminPlaces";
 import AdminReviews from "./pages/AdminReviews";
 import AdminComments from "./pages/AdminComments";
 import AdminCategories from "./pages/AdminCategories";
+import Favorites from "./pages/Favorites";
+import MapView from "./pages/MapView";
 
 function Router() {
   return (
@@ -24,6 +26,8 @@ function Router() {
       <Route path={"/admin/reviews"} component={AdminReviews} />
       <Route path={"/admin/comments"} component={AdminComments} />
       <Route path={"/admin/categories"} component={AdminCategories} />
+      <Route path={"/favorites"} component={Favorites} />
+      <Route path={"/map"} component={MapView} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

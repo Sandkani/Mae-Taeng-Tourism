@@ -1,6 +1,6 @@
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, places, reviews, InsertPlace, InsertReview, categories, InsertCategory } from "../drizzle/schema";
+import { InsertUser, users, places, reviews, InsertPlace, InsertReview, categories, InsertCategory, favorites, InsertFavorite } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -328,4 +328,54 @@ export async function getViewStats() {
     .limit(3);
   
   return { totalViews, viewsByCategory, topPlaces };
+}
+
+// ============ Favorites ============
+
+export async function addFavorite(userId: number, placeId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(favorites).values({ userId, placeId });
+}
+
+export async function removeFavorite(userId: number, placeId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(favorites).where(
+    and(eq(favorites.userId, userId), eq(favorites.placeId, placeId))
+  );
+}
+
+export async function getUserFavorites(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select({
+      id: favorites.id,
+      placeId: favorites.placeId,
+      place: places,
+      createdAt: favorites.createdAt,
+    })
+    .from(favorites)
+    .leftJoin(places, eq(favorites.placeId, places.id))
+    .where(eq(favorites.userId, userId))
+    .orderBy(desc(favorites.createdAt));
+  
+  return result;
+}
+
+export async function isFavorite(userId: number, placeId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db
+    .select()
+    .from(favorites)
+    .where(and(eq(favorites.userId, userId), eq(favorites.placeId, placeId)))
+    .limit(1);
+  
+  return result.length > 0;
 }

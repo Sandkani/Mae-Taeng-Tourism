@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Star, Eye, Loader2, ArrowLeft, Send } from "lucide-react";
+import { MapPin, Star, Eye, Loader2, ArrowLeft, Send, Heart } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -19,7 +19,25 @@ export default function PlaceDetail() {
 
   const { data: place, isLoading } = trpc.places.getById.useQuery({ id: placeId });
   const { data: reviews = [] } = trpc.reviews.getByPlaceId.useQuery({ placeId });
+  const { data: isFavorite = false } = trpc.favorites.isFavorite.useQuery(
+    { placeId },
+    { enabled: isAuthenticated }
+  );
   const incrementView = trpc.places.incrementView.useMutation();
+  const addFavorite = trpc.favorites.add.useMutation({
+    onSuccess: () => {
+      utils.favorites.isFavorite.invalidate({ placeId });
+      utils.favorites.list.invalidate();
+      toast.success("เพิ่มลงรายการโปรดแล้ว");
+    },
+  });
+  const removeFavorite = trpc.favorites.remove.useMutation({
+    onSuccess: () => {
+      utils.favorites.isFavorite.invalidate({ placeId });
+      utils.favorites.list.invalidate();
+      toast.success("ลบออกจากรายการโปรดแล้ว");
+    },
+  });
   const createReview = trpc.reviews.create.useMutation({
     onSuccess: () => {
       utils.reviews.getByPlaceId.invalidate({ placeId });
@@ -141,7 +159,27 @@ export default function PlaceDetail() {
 
             {/* Title and Stats */}
             <div>
-              <h2 className="text-4xl font-bold text-foreground mb-4">{place.name}</h2>
+              <div className="flex items-start justify-between mb-4">
+                <h2 className="text-4xl font-bold text-foreground">{place.name}</h2>
+                {isAuthenticated && (
+                  <Button
+                    variant={isFavorite ? "default" : "outline"}
+                    size="lg"
+                    className={`gap-2 ${isFavorite ? 'bg-red-500 hover:bg-red-600' : ''}`}
+                    onClick={() => {
+                      if (isFavorite) {
+                        removeFavorite.mutate({ placeId });
+                      } else {
+                        addFavorite.mutate({ placeId });
+                      }
+                    }}
+                    disabled={addFavorite.isPending || removeFavorite.isPending}
+                  >
+                    <Heart className={`h-5 w-5 ${isFavorite ? 'fill-white' : ''}`} />
+                    {isFavorite ? 'ลบออกจากรายการโปรด' : 'เพิ่มลงรายการโปรด'}
+                  </Button>
+                )}
+              </div>
               <div className="flex items-center gap-6 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
