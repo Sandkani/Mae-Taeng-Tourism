@@ -14,6 +14,8 @@ import AdminComments from "./pages/AdminComments";
 import AdminCategories from "./pages/AdminCategories";
 import Favorites from "./pages/Favorites";
 import MapView from "./pages/MapView";
+import SharedFavorites from "./pages/SharedFavorites";
+import Notifications from "./pages/Notifications";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path={"/admin/categories"} component={AdminCategories} />
       <Route path={"/favorites"} component={Favorites} />
       <Route path={"/map"} component={MapView} />
+      <Route path={"/shared/:shareId"} component={SharedFavorites} />
+      <Route path={"/notifications"} component={Notifications} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

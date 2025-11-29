@@ -94,3 +94,38 @@ export const favorites = mysqlTable("favorites", {
 
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = typeof favorites.$inferInsert;
+
+/**
+ * รายการโปรดที่แชร์ (Shared Favorites)
+ */
+export const sharedFavorites = mysqlTable("sharedFavorites", {
+  id: int("id").autoincrement().primaryKey(),
+  shareId: varchar("shareId", { length: 64 }).notNull().unique(), // ID สำหรับแชร์
+  userId: int("userId").notNull(), // ผู้สร้างรายการ
+  title: varchar("title", { length: 255 }).notNull(), // ชื่อรายการ
+  description: text("description"), // คำอธิบาย
+  placeIds: text("placeIds").notNull(), // JSON array ของ place IDs
+  viewCount: int("viewCount").default(0).notNull(), // ยอดวิว
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SharedFavorite = typeof sharedFavorites.$inferSelect;
+export type InsertSharedFavorite = typeof sharedFavorites.$inferInsert;
+
+/**
+ * การแจ้งเตือน (Notifications)
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // null = แจ้งถึงทุกคน
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  type: mysqlEnum("type", ["info", "success", "warning", "error"]).default("info").notNull(),
+  isRead: boolean("isRead").default(false).notNull(),
+  link: text("link"), // ลิงก์ที่เกี่ยวข้อง (ถ้ามี)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

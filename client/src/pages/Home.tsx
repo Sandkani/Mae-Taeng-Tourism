@@ -6,9 +6,29 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Star, Eye, Loader2, Sparkles, Search, Filter } from "lucide-react";
+import { MapPin, Star, Eye, Loader2, Sparkles, Search, Filter, Bell } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useMemo } from "react";
+
+function NotificationBell() {
+  const { data: unreadCount = 0 } = trpc.notifications.unreadCount.useQuery();
+  
+  return (
+    <Link href="/notifications">
+      <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <Badge
+            variant="destructive"
+            className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+          >
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </Badge>
+        )}
+      </Button>
+    </Link>
+  );
+}
 
 export default function Home() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -69,6 +89,7 @@ export default function Home() {
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             ) : isAuthenticated && user ? (
               <>
+                <NotificationBell />
                 <Link href="/favorites">
                   <Button variant="ghost" className="gap-2 hover:bg-primary/10">
                     <span className="hidden sm:inline">รายการโปรด</span>

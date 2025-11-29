@@ -150,3 +150,25 @@
 - [x] เขียน unit tests สำหรับ favorites (7 tests)
 - [x] ทดสอบระบบทั้งหมด - ผ่าน 45/45 tests
 - [x] Push ไปยัง GitHub (commit: c2df077)
+
+## ฟีเจอร์ใหม่ - ระบบแชร์ เส้นทาง และแจ้งเตือน
+- [x] เพิ่มระบบแชร์รายการโปรด (Share Favorites)
+- [x] สร้าง URL สำหรับแชร์รายการโปรดของผู้ใช้
+- [x] เพิ่มปุ่มแชร์ไปยัง Facebook, Line, Twitter
+- [x] เพิ่มปุ่มคัดลอก URL
+- [x] เพิ่มหน้าดูรายการโปรดที่ถูกแชร์ (/shared/:shareId)
+- [x] เพิ่มฟีเจอร์คำนวณเส้นทางใน Map View
+- [x] เพิ่มปุ่มเลือกสถานที่หลายแห่งเพื่อคำนวณเส้นทาง (สูงสุด 10 แห่ง)
+- [x] ใช้ Google Directions API คำนวณเส้นทาง
+- [x] แสดงเส้นทางบนแผนที่
+- [x] แสดงระยะทางและเวลาโดยประมาณ
+- [x] เพิ่มระบบแจ้งเตือน (Notifications)
+- [x] สร้างตาราง notifications ใน schema
+- [x] สร้าง procedures สำหรับจัดการแจ้งเตือน (list, unreadCount, markAsRead, markAllAsRead, create, delete)
+- [x] เพิ่มไอคอนแจ้งเตือนใน header พร้อมตัวนับ
+- [x] สร้างหน้าดูแจ้งเตือนทั้งหมด (/notifications)
+- [x] Admin สามารถส่งแจ้งเตือนถึงผู้ใช้ทั้งหมด
+- [x] เขียน unit tests สำหรับฟีเจอร์ใหม่ (sharedFavorites: 4 tests, notifications: 7 tests)
+- [x] ทดสอบระบบทั้งหมด - ผ่าน 56/56 tests
+- [ ] Push ไปยัง GitHub
+- [ ] บันทึก checkpoint

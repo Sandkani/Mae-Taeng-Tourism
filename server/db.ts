@@ -1,6 +1,6 @@
 import { eq, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, places, reviews, InsertPlace, InsertReview, categories, InsertCategory, favorites, InsertFavorite } from "../drizzle/schema";
+import { InsertUser, users, places, reviews, InsertPlace, InsertReview, categories, InsertCategory, favorites, InsertFavorite, sharedFavorites, notifications, InsertNotification } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -378,4 +378,145 @@ export async function isFavorite(userId: number, placeId: number): Promise<boole
     .limit(1);
   
   return result.length > 0;
+}
+
+// Shared Favorites queries
+export async function createSharedFavorite(userId: number, data: { title: string; description?: string; placeIds: number[] }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Generate unique shareId
+  const shareId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  
+  const result = await db.insert(sharedFavorites).values({
+    shareId,
+    userId,
+    title: data.title,
+    description: data.description || null,
+    placeIds: JSON.stringify(data.placeIds),
+  });
+  
+  return {
+    shareId,
+    id: Number(result[0].insertId),
+  };
+}
+
+export async function getSharedFavoriteByShareId(shareId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db
+    .select()
+    .from(sharedFavorites)
+    .where(eq(sharedFavorites.shareId, shareId))
+    .limit(1);
+  
+  if (result.length === 0) return null;
+  
+  const shared = result[0];
+  const placeIds = JSON.parse(shared.placeIds as string) as number[];
+  
+  // Get places
+  const placesResult = await db
+    .select()
+    .from(places)
+    .where(sql`${places.id} IN (${sql.join(placeIds.map(id => sql`${id}`), sql`, `)})`)
+    .execute();
+  
+  // Get creator info
+  const creator = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+    })
+    .from(users)
+    .where(eq(users.id, shared.userId))
+    .limit(1);
+  
+  return {
+    ...shared,
+    places: placesResult,
+    creator: creator[0] || null,
+  };
+}
+
+export async function incrementSharedFavoriteView(shareId: string) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(sharedFavorites)
+    .set({ viewCount: sql`${sharedFavorites.viewCount} + 1` })
+    .where(eq(sharedFavorites.shareId, shareId));
+}
+
+// Notifications queries
+export async function createNotification(data: InsertNotification) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(notifications).values(data);
+}
+
+export async function getUserNotifications(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select()
+    .from(notifications)
+    .where(
+      sql`${notifications.userId} = ${userId} OR ${notifications.userId} IS NULL`
+    )
+    .orderBy(desc(notifications.createdAt));
+  
+  return result;
+}
+
+export async function getUnreadNotificationCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(notifications)
+    .where(
+      and(
+        sql`(${notifications.userId} = ${userId} OR ${notifications.userId} IS NULL)`,
+        eq(notifications.isRead, false)
+      )
+    );
+  
+  return Number(result[0]?.count || 0);
+}
+
+export async function markNotificationAsRead(notificationId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(notifications)
+    .set({ isRead: true })
+    .where(eq(notifications.id, notificationId));
+}
+
+export async function markAllNotificationsAsRead(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(notifications)
+    .set({ isRead: true })
+    .where(
+      sql`(${notifications.userId} = ${userId} OR ${notifications.userId} IS NULL) AND ${notifications.isRead} = false`
+    );
+}
+
+export async function deleteNotification(notificationId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.delete(notifications).where(eq(notifications.id, notificationId));
 }

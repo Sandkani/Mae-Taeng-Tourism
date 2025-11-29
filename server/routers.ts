@@ -212,6 +212,88 @@ export const appRouter = router({
       }),
   }),
   
+  sharedFavorites: router({
+    // Create shared favorite list
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        placeIds: z.array(z.number()),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createSharedFavorite(ctx.user.id, input);
+      }),
+    
+    // Get shared favorite by shareId
+    getByShareId: publicProcedure
+      .input(z.object({ shareId: z.string() }))
+      .query(async ({ input }) => {
+        return await db.getSharedFavoriteByShareId(input.shareId);
+      }),
+    
+    // Increment view count for shared favorite
+    incrementView: publicProcedure
+      .input(z.object({ shareId: z.string() }))
+      .mutation(async ({ input }) => {
+        await db.incrementSharedFavoriteView(input.shareId);
+        return { success: true };
+      }),
+  }),
+  
+  notifications: router({
+    // Get user notifications
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserNotifications(ctx.user.id);
+    }),
+    
+    // Get unread count
+    unreadCount: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUnreadNotificationCount(ctx.user.id);
+    }),
+    
+    // Mark as read
+    markAsRead: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.markNotificationAsRead(input.notificationId);
+        return { success: true };
+      }),
+    
+    // Mark all as read
+    markAllAsRead: protectedProcedure.mutation(async ({ ctx }) => {
+      await db.markAllNotificationsAsRead(ctx.user.id);
+      return { success: true };
+    }),
+    
+    // Create notification (admin only)
+    create: adminProcedure
+      .input(z.object({
+        userId: z.number().optional(), // null = แจ้งถึงทุกคน
+        title: z.string(),
+        message: z.string(),
+        type: z.enum(["info", "success", "warning", "error"]).optional(),
+        link: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.createNotification({
+          userId: input.userId || null,
+          title: input.title,
+          message: input.message,
+          type: input.type || "info",
+          link: input.link || null,
+        });
+        return { success: true };
+      }),
+    
+    // Delete notification
+    delete: protectedProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteNotification(input.notificationId);
+        return { success: true };
+      }),
+  }),
+  
   favorites: router({
     // Add favorite
     add: protectedProcedure

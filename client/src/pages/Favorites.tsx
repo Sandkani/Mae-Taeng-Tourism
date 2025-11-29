@@ -4,7 +4,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Star, Eye, Loader2, Heart, Trash2, ArrowLeft } from "lucide-react";
+import { MapPin, Star, Eye, Loader2, Heart, Trash2, ArrowLeft, Share2, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -20,6 +25,66 @@ export default function Favorites() {
       toast.success("ลบออกจากรายการโปรดแล้ว");
     },
   });
+  
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareTitle, setShareTitle] = useState("สถานที่ท่องเที่ยวแนะนำของฉัน");
+  const [shareDescription, setShareDescription] = useState("");
+  const [shareUrl, setShareUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+  
+  const createShare = trpc.sharedFavorites.create.useMutation({
+    onSuccess: (data) => {
+      const url = `${window.location.origin}/shared/${data.shareId}`;
+      setShareUrl(url);
+      toast.success("สร้างลิงก์แชร์สำเร็จแล้ว!");
+    },
+    onError: () => {
+      toast.error("เกิดข้อผิดพลาดในการสร้างลิงก์");
+    },
+  });
+  
+  const handleShare = () => {
+    if (favorites.length === 0) {
+      toast.error("ไม่มีรายการโปรดที่จะแชร์");
+      return;
+    }
+    
+    const placeIds = favorites.map(fav => fav.placeId).filter(id => id !== null) as number[];
+    createShare.mutate({
+      title: shareTitle,
+      description: shareDescription,
+      placeIds,
+    });
+  };
+  
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    toast.success("คัดลอกลิงก์แล้ว!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+  
+  const shareToSocial = (platform: string) => {
+    const text = encodeURIComponent(`${shareTitle} - ${APP_TITLE}`);
+    const url = encodeURIComponent(shareUrl);
+    
+    let shareLink = "";
+    switch (platform) {
+      case "facebook":
+        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case "line":
+        shareLink = `https://social-plugins.line.me/lineit/share?url=${url}`;
+        break;
+      case "twitter":
+        shareLink = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+        break;
+    }
+    
+    if (shareLink) {
+      window.open(shareLink, "_blank", "width=600,height=400");
+    }
+  };
 
   if (authLoading) {
     return (
@@ -84,12 +149,133 @@ export default function Favorites() {
       {/* Main Content */}
       <main className="container mx-auto px-4 pb-16 flex-1">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <Heart className="h-8 w-8 text-red-500 fill-red-500" />
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">รายการโปรด</h2>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <Heart className="h-8 w-8 text-red-500 fill-red-500" />
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">รายการโปรด</h2>
+            </div>
+            {favorites && favorites.length > 0 && (
+              <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-gradient-nature hover:opacity-90 gap-2">
+                    <Share2 className="h-4 w-4" />
+                    แชร์รายการ
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>แชร์รายการโปรด</DialogTitle>
+                    <DialogDescription>
+                      แชร์สถานที่ท่องเที่ยวที่คุณชื่นชอบไปยังเพื่อนๆ
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  {!shareUrl ? (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">ชื่อรายการ</Label>
+                        <Input
+                          id="title"
+                          value={shareTitle}
+                          onChange={(e) => setShareTitle(e.target.value)}
+                          placeholder="สถานที่ท่องเที่ยวแนะนำของฉัน"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">คำอธิบาย (ถ้ามี)</Label>
+                        <Textarea
+                          id="description"
+                          value={shareDescription}
+                          onChange={(e) => setShareDescription(e.target.value)}
+                          placeholder="เพิ่มคำอธิบายสั้นๆ เกี่ยวกับรายการนี้"
+                          rows={3}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button
+                          onClick={handleShare}
+                          disabled={createShare.isPending || !shareTitle.trim()}
+                          className="w-full bg-gradient-nature hover:opacity-90"
+                        >
+                          {createShare.isPending ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              กำลังสร้าง...
+                            </>
+                          ) : (
+                            <>
+                              <Share2 className="h-4 w-4 mr-2" />
+                              สร้างลิงก์แชร์
+                            </>
+                          )}
+                        </Button>
+                      </DialogFooter>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>ลิงก์สำหรับแชร์</Label>
+                        <div className="flex gap-2">
+                          <Input value={shareUrl} readOnly className="flex-1" />
+                          <Button
+                            onClick={copyToClipboard}
+                            variant="outline"
+                            size="icon"
+                          >
+                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>แชร์ไปยัง</Label>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => shareToSocial("facebook")}
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            Facebook
+                          </Button>
+                          <Button
+                            onClick={() => shareToSocial("line")}
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            Line
+                          </Button>
+                          <Button
+                            onClick={() => shareToSocial("twitter")}
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            Twitter
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <DialogFooter>
+                        <Button
+                          onClick={() => {
+                            setShareDialogOpen(false);
+                            setShareUrl("");
+                            setShareTitle("สถานที่ท่องเที่ยวแนะนำของฉัน");
+                            setShareDescription("");
+                          }}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          ปิด
+                        </Button>
+                      </DialogFooter>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
           <p className="text-muted-foreground text-lg">
-            สถานที่ท่องเที่ยวที่คุณบันทึกไว้
+            สถานที่ท่องเที่ยวที่คุณบันทึกไว้ ({favorites.length} แห่ง)
           </p>
         </div>
 
